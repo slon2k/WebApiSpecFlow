@@ -4,9 +4,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Api.Entities
+namespace Api.Models
 {
-    public class Author : Entity
+    public class AuthorCreateDto
     {
         [Required]
         [MaxLength(50)]
@@ -20,7 +20,7 @@ namespace Api.Entities
         [MaxLength(50)]
         public string Genre { get; set; }
 
-        public ICollection<Book> Books { get; set; }
-            = new List<Book>();
+        public ICollection<BookDto> Books { get; set; }
+            = new List<BookDto>();
     }
 }

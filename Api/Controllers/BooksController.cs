@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Api.Data;
 using Api.Entities;
+using AutoMapper;
+using Api.Models;
 
 namespace Api.Controllers
 {
@@ -15,26 +17,29 @@ namespace Api.Controllers
     public class BooksController : ControllerBase
     {
         private readonly DataContext _context;
+        private readonly IMapper _mapper;
 
-        public BooksController(DataContext context)
+        public BooksController(DataContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        // GET: api/Books
+        // GET: api/Authors/2/Books
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Book>>> GetBooksForAuthor(int authorId)
+        public async Task<ActionResult<IEnumerable<BookDto>>> GetBooksForAuthor(int authorId)
         {
             if (!_context.Authors.Any(a => a.Id == authorId))
             {
                 return NotFound();
             }
-            return await _context.Books.Where(b => b.AuthorId == authorId).ToListAsync();
+            var books = await _context.Books.Where(b => b.AuthorId == authorId).ToListAsync();
+            return _mapper.Map<List<BookDto>>(books);
         }
 
-        // GET: api/Books/5
+        // GET: api/Authors/2/Books/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Book>> GetBook(int authorId, int id)
+        public async Task<ActionResult<BookDto>> GetBook(int authorId, int id)
         {
             if (!_context.Authors.Any(a => a.Id == authorId))
             {
@@ -48,24 +53,32 @@ namespace Api.Controllers
                 return NotFound();
             }
 
-            return book;
+            if (book.AuthorId != authorId)
+            {
+                return BadRequest();
+            }
+
+            return _mapper.Map<BookDto>(book);
         }
 
-        // PUT: api/Books/5
+        // PUT: api/Authors/2/Books/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutBook(int authorId, int id, Book book)
+        public async Task<IActionResult> PutBook(int authorId, int id, BookUpdateDto bookDto)
         {
             if (!_context.Authors.Any(a => a.Id == authorId))
             {
                 return NotFound();
             }
+            var book = await _context.Books.FindAsync(id);
             
-            if (id != book.Id || book.AuthorId != authorId)
+            if ( book.AuthorId != authorId)
             {
                 return BadRequest();
             }
 
             _context.Entry(book).State = EntityState.Modified;
+
+            _mapper.Map(bookDto, book);
 
             try
             {
@@ -86,29 +99,27 @@ namespace Api.Controllers
             return NoContent();
         }
 
-        // POST: api/Books
+        // POST: api/Authors/2/Books
         [HttpPost]
-        public async Task<ActionResult<Book>> PostBook(int authorId, Book book)
+        public async Task<ActionResult<BookDto>> PostBook(int authorId, BookCreateDto bookDto)
         {
             if (!_context.Authors.Any(a => a.Id == authorId))
             {
                 return NotFound();
             }
 
-            if (book.AuthorId != authorId)
-            {
-                return BadRequest();
-            }
+            var book = _mapper.Map<Book>(bookDto);
+            book.AuthorId = authorId;
 
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetBook", new { id = book.Id }, book);
+            return CreatedAtAction("GetBook", new {authorId = authorId, id = book.Id }, _mapper.Map<BookDto>(book));
         }
 
-        // DELETE: api/Books/5
+        // DELETE: api/Authors/2/Books/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Book>> DeleteBook(int authorId, int id)
+        public async Task<ActionResult> DeleteBook(int authorId, int id)
         {
             if (!_context.Authors.Any(a => a.Id == authorId))
             {
@@ -116,6 +127,7 @@ namespace Api.Controllers
             }
 
             var book = await _context.Books.FindAsync(id);
+            
             if (book == null)
             {
                 return NotFound();
@@ -129,7 +141,7 @@ namespace Api.Controllers
             _context.Books.Remove(book);
             await _context.SaveChangesAsync();
 
-            return book;
+            return NoContent();
         }
 
         private bool BookExists(int id)

@@ -4,23 +4,20 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Api.Entities
+namespace Api.Models
 {
-    public class Author : Entity
+    public class AuthorUpdateDto
     {
-        [Required]
         [MaxLength(50)]
         public string FirstName { get; set; }
 
-        [Required]
         [MaxLength(50)]
         public string LastName { get; set; }
 
-        [Required]
         [MaxLength(50)]
         public string Genre { get; set; }
 
-        public ICollection<Book> Books { get; set; }
-            = new List<Book>();
+        public ICollection<BookDto> Books { get; set; }
+            = new List<BookDto>();
     }
 }
