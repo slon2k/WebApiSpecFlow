@@ -31,6 +31,12 @@ namespace Api
         {
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddCors(
+                option => option.AddPolicy("CorsPolicy",
+                    policy => policy
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowAnyOrigin()));
             services.AddAutoMapper(typeof(MappingProfile));
             services.AddControllers();
         }
@@ -42,6 +48,8 @@ namespace Api
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCors("CorsPolicy");
 
             app.UseHttpsRedirection();
 

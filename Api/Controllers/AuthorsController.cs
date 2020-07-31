@@ -37,7 +37,7 @@ namespace Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<AuthorDto>> GetAuthor(int id)
         {
-            var author = await _context.Authors.FindAsync(id);
+            var author = await _context.Authors.Include(a => a.Books).FirstOrDefaultAsync(a => a.Id == id);
 
             if (author == null)
             {
