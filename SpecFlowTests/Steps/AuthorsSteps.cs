@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -24,10 +25,11 @@ namespace SpecFlowTests.Steps
         private HttpClient client { get; set; }
         private HttpResponseMessage response { get; set; }
         private HttpStatusCode statusCode;
+        private object responseContent { get; set; }
         const string BaseURL = "https://localhost";
         public string requestdata { get; private set; }
 
-        public AuthorsSteps(ScenarioContext scenarioContext, CustomWebApplicationFactory<Api.Startup> factory)
+        public AuthorsSteps(ScenarioContext scenarioContext, CustomWebApplicationFactory<Startup> factory)
         {
             this.scenarioContext = scenarioContext;
             this.factory = factory;
@@ -46,6 +48,7 @@ namespace SpecFlowTests.Steps
         public async Task WhenIMakeRequestTo(string endpoint)
         {
             response = await client.GetAsync(endpoint);
+            responseContent = await response.Content.ReadFromJsonAsync<object>();
             statusCode = response.StatusCode;
         }
         
@@ -56,11 +59,12 @@ namespace SpecFlowTests.Steps
             requestdata = JsonSerializer.Serialize(author);
             HttpContent content = new StringContent(requestdata, Encoding.UTF8, "application/json");
             response = await client.PostAsync(endpoint, content);
+            responseContent = await response.Content.ReadFromJsonAsync<object>();
             statusCode = response.StatusCode;
         }
 
-        [When(@"I make chenge request to ""(.*)"" with data")]
-        public async Task WhenIMakeChengeRequestToWithData(string endpoint, Table table)
+        [When(@"I make change request to ""(.*)"" with data")]
+        public async Task WhenIMakeChangeRequestToWithData(string endpoint, Table table)
         {
             var author = table.CreateSet<AuthorUpdateDto>().First();
             requestdata = JsonSerializer.Serialize(author);

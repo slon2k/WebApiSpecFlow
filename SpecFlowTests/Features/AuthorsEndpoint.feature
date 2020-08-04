@@ -24,7 +24,7 @@ Scenario: I can add a new author
 @put @author
 Scenario: I can update the author
 	Given I am a client
-	When I make chenge request to "/api/authors/3" with data
+	When I make change request to "/api/authors/3" with data
 	| FirstName | LastName | Genre           |
 	| Douglas   | Adams    | Modified  |
 	Then the response status code should be "NoContent"

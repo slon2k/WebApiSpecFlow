@@ -278,7 +278,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Adams",
                             "Modified"});
 #line 27
- testRunner.When("I make chenge request to \"/api/authors/3\" with data", ((string)(null)), table2, "When ");
+ testRunner.When("I make change request to \"/api/authors/3\" with data", ((string)(null)), table2, "When ");
 #line hidden
 #line 30
  testRunner.Then("the response status code should be \"NoContent\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

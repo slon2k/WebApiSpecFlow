@@ -24,7 +24,7 @@ namespace SpecFlowTests
 
                 services.AddDbContext<DataContext>(options =>
                 {
-                    options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=lib-db-test;Trusted_Connection=True;");
+                    options.UseInMemoryDatabase("lib-db");
                 });
 
                 var sp = services.BuildServiceProvider();
